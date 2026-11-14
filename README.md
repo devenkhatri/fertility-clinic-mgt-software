@@ -151,24 +151,88 @@ AURA IVF enforces clinical specialty separation so medical staff only interact w
 
 ## 🚀 Quickstart & Installation
 
-### Prerequisites
-* **PHP:** >= 8.2 (Extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`)
-* **Composer:** >= 2.x
-* **Database:** MySQL >= 8.0, MariaDB >= 10.4, or SQLite
-* **Web Server:** Apache (XAMPP / MAMP), Nginx, or built-in PHP server
+### Option A: Instant Docker Setup (Recommended)
 
-### 1. Clone the Repository
+Run the entire application stack (Nginx + PHP 8.2-FPM + MySQL 8.0 + Redis) with a single command without installing PHP, Composer, Node.js, or MySQL locally.
+
+#### Prerequisites
+* **Docker Engine:** >= 24.0
+* **Docker Compose:** >= v2.20
+
+#### 1. Clone the Repository
 ```bash
 git clone https://github.com/webotapp-academy/fertility-clinic-mgt-software.git
 cd fertility-clinic-mgt-software
 ```
 
-### 2. Install Dependencies
+#### 2. Configure Environment
+```bash
+cp .env.docker.example .env
+```
+
+#### 3. Build & Start the Docker Stack
+```bash
+docker compose up -d --build
+```
+> [!NOTE]
+> The container entrypoint will automatically ensure proper storage permissions, generate the `APP_KEY` if missing, create the public storage symlink, and verify database connectivity.
+
+#### 4. Run Migrations & Clinical Seeder
+Initialize the database schema and clinical test trajectory data:
+```bash
+docker compose exec app php artisan migrate --seed
+```
+
+#### 5. Launch Workstation
+Navigate in your browser to:
+```
+http://localhost:8000
+```
+
+#### Common Docker Operations
+* **View application and web server logs:**
+  ```bash
+  docker compose logs -f app nginx
+  ```
+* **Run Artisan commands inside container:**
+  ```bash
+  docker compose exec app php artisan <command>
+  ```
+* **Run Tinker shell:**
+  ```bash
+  docker compose exec app php artisan tinker
+  ```
+* **Stop containers:**
+  ```bash
+  docker compose down
+  ```
+* **Reset stack & clear persistent database volumes:**
+  ```bash
+  docker compose down -v
+  ```
+
+---
+
+### Option B: Local / Bare Metal Installation (PHP & Composer)
+
+#### Prerequisites
+* **PHP:** >= 8.2 (Extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`)
+* **Composer:** >= 2.x
+* **Database:** MySQL >= 8.0, MariaDB >= 10.4, or SQLite
+* **Web Server:** Apache (XAMPP / MAMP), Nginx, or built-in PHP server
+
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/webotapp-academy/fertility-clinic-mgt-software.git
+cd fertility-clinic-mgt-software
+```
+
+#### 2. Install Dependencies
 ```bash
 composer install --no-dev --optimize-autoloader
 ```
 
-### 3. Configure Environment
+#### 3. Configure Environment
 ```bash
 cp .env.example .env
 php artisan key:generate
@@ -184,13 +248,13 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### 4. Run Migrations & Clinical Seeder
+#### 4. Run Migrations & Clinical Seeder
 Create the MySQL database (`CREATE DATABASE ivf;`), then run:
 ```bash
 php artisan migrate --seed
 ```
 
-### 5. Launch Workstation
+#### 5. Launch Workstation
 ```bash
 php artisan serve
 ```
